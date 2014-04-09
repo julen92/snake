@@ -37,3 +37,7 @@
     top: -500px;
 };
 
+#img {
+    background-image:  url("/home/super-maciek/snake/explosion.gif");
+
+}

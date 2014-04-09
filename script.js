@@ -1,10 +1,10 @@
 var intervalHandler = null;
-var duration = 400;
+var duration = 250;
 function position(position) {
     this.x = position.x;
     this.y = position.y
-    this.copy = function(){
-        return {x: this.x, y:this.y};
+    this.copy = function() {
+        return {x: this.x, y: this.y};
     }
 }
 ;
@@ -24,6 +24,10 @@ function snakeItem(initialPosition) {
 
 var snake = {
     body: [
+        new snakeItem(new position({x: 7, y: 3})),
+        new snakeItem(new position({x: 6, y: 3})),
+        new snakeItem(new position({x: 5, y: 3})),
+        new snakeItem(new position({x: 4, y: 3})),
         new snakeItem(new position({x: 3, y: 3})),
         new snakeItem(new position({x: 2, y: 3})),
         new snakeItem(new position({x: 1, y: 3}))
@@ -33,6 +37,13 @@ var snake = {
         return this.body[0];
     },
     detectCollision: function(velocity) {
+        for (i = this.body.length - 2; i > 0; i--) {
+            if (this.body[i].position.x == (this.getHead().position.x + this.velocity.x)
+                    && this.body[i].position.y == (this.getHead().position.y + this.velocity.y)) {
+                return true;
+            }
+        }
+
         if (
                 this.getHead().position.x + this.velocity.x + 1 > $('#box').width() / $('#head').width() ||
                 this.getHead().position.y + this.velocity.y + 1 > $('#box').height() / $('#head').height() ||
@@ -40,7 +51,6 @@ var snake = {
                 this.getHead().position.y + this.velocity.y < 0
                 )
         {
-            alert("You Loose")
             return true;
         }
         return false;
@@ -49,11 +59,12 @@ var snake = {
         var offset = 0;
         var currentNode = null;
         for (i in this.body) {
-            offset = 2 + parseInt(i);
+            offset = 3 + parseInt(i);
             currentNode = $('#box :nth-child(' + offset + ')');
-            
-            if(currentNode.size() == 0) $('#box').append($('<div class="snakeItem"></div>'));
-            
+
+            if (currentNode.size() == 0)
+                $('#box').append($('<div class="snakeItem"></div>'));
+
             currentNode.animate({top: $('#head').height() * this.body[i].position.y + "px"}, duration / 3);
             currentNode.animate({left: $('#head').width() * this.body[i].position.x + "px"}, duration / 3);
         }
@@ -76,8 +87,8 @@ var snake = {
         $('#head').rotate(angle);
     },
     move: function() {
-        for(i = this.body.length -1; i>0; i--){
-            this.body[i].position = new position(this.body[i-1].position.copy());
+        for (i = this.body.length - 1; i > 0; i--) {
+            this.body[i].position = new position(this.body[i - 1].position.copy());
         }
         this.getHead().move(this.velocity);
     }
@@ -101,22 +112,23 @@ var food = {
 
 var makeAStep = function() {
     if (snake.detectCollision(snake.velocity) === true) {
+        alert("You Loose, what a pity!");
         clearInterval(intervalHandler);
         return;
     }
 
-    var lastItemPosition = snake.body[snake.body.length-1].position.copy();
-    
+    var lastItemPosition = snake.body[snake.body.length - 1].position.copy();
+
     snake.move();
-    
+
     if (snake.getHead().isOnPosition(food.position)) {
         food.updateScore();
         generateFood();
         snake.body.push(new snakeItem(lastItemPosition));
     }
-    
+
     snake.screenUpdate();
-    
+
 };
 
 var generateFood = function() {
@@ -167,7 +179,7 @@ $(document).ready(function() {
     init();
     intervalHandler = setInterval(makeAStep, duration);
 });
-        
+
 
 
 

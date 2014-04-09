@@ -62,13 +62,16 @@ var snake = {
             offset = 3 + parseInt(i);
             currentNode = $('#box :nth-child(' + offset + ')');
 
-            if (currentNode.size() == 0)
+            if (currentNode.size() == 0) {
                 $('#box').append($('<div class="snakeItem"></div>'));
-
-            currentNode.animate({top: $('#head').height() * this.body[i].position.y + "px"}, duration / 3);
-            currentNode.animate({left: $('#head').width() * this.body[i].position.x + "px"}, duration / 3);
+                currentNode = $('#box :nth-child(' + offset + ')');
+                currentNode.css({top: $('#head').height() * this.body[i].position.y + "px"}, duration / 3);
+                currentNode.css({left: $('#head').width() * this.body[i].position.x + "px"}, duration / 3);
+            } else {
+                currentNode.animate({top: $('#head').height() * this.body[i].position.y + "px"}, duration / 3);
+                currentNode.animate({left: $('#head').width() * this.body[i].position.x + "px"}, duration / 3);
+            }
         }
-
         var angle = 0;
         if (this.velocity.y === 0) {
             if (this.velocity.x === -1) {
@@ -151,7 +154,7 @@ var init = function() {
     //initialize position of snake body
     var offset = 0;
     for (i in snake.body) {
-        offset = 2 + parseInt(i);
+        offset = 3 + parseInt(i);
         $('#box :nth-child(' + offset + ')').css('left', $('#head').width() * snake.body[i].position.x);
         $('#box :nth-child(' + offset + ')').css('top', $('#head').height() * snake.body[i].position.y);
     }
@@ -180,11 +183,3 @@ $(document).ready(function() {
     intervalHandler = setInterval(makeAStep, duration);
 });
 
-
-
-
-
-
-
-
-   

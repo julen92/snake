@@ -17,9 +17,13 @@
 #box .snakeItem {
     width: 40px;
     height: 40px;
-    background-color: orange;
+    //background-color: orange;
     position: absolute;
-    border-radius: 50%;
+    //border-radius: 50%;
+    background-image: url('ball.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 #food {
@@ -32,13 +36,35 @@
 }
 
 #score {
-    height: 50px;
-    width: 50px;
+    height: 60px;
+    width: 80px;
     border: 2px solid black;
     border-radius: 5px;
-    background-color: #00FFFF;
+    background-color: grey;
     text-align: center;
     position: absolute;
-    left: 810px;
-    top: -0px;
-};
+    left: 830px;
+    top: 20px;
+
+
+}
+#soft    {
+    text-align: center;
+    font-size: 50px;
+    position: absolute;
+    left: 830px;
+    top: 40px;
+    color: purple;
+
+}
+
+#guide {
+    font-size:16px;
+    position: absolute;
+    left: 900px;
+    top:  200px;
+    color: blue;
+    list-style:none;
+    text-align:center
+}
+

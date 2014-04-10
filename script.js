@@ -1,5 +1,6 @@
 var intervalHandler = null;
-var duration = 250;
+var snakeBeginDomOffset = 2;
+var duration = 150;
 function position(position) {
     this.x = position.x;
     this.y = position.y
@@ -37,7 +38,7 @@ var snake = {
         return this.body[0];
     },
     detectCollision: function(velocity) {
-        for (i = this.body.length - 2; i > 0; i--) {
+        for (i = this.body.length - snakeBeginDomOffset; i > 0; i--) {
             if (this.body[i].position.x == (this.getHead().position.x + this.velocity.x)
                     && this.body[i].position.y == (this.getHead().position.y + this.velocity.y)) {
                 return true;
@@ -55,11 +56,18 @@ var snake = {
         }
         return false;
     },
-    screenUpdate: function() {
+    updateFireballSize: function() {      
+        for (i = this.body.length - 1; i > 0; i--) {
+            currentSize = 100 * (snake.body.length - i)/snake.body.length;
+            currentNode = $('#box :nth-child(' + (i + snakeBeginDomOffset) + ')');
+            currentNode.css('background-size', currentSize + '% ' + currentSize + '%');
+        }
+    },
+    screenUpdate: function(options) {
         var offset = 0;
         var currentNode = null;
         for (i in this.body) {
-            offset = 2 + parseInt(i);
+            offset = snakeBeginDomOffset + parseInt(i);
             currentNode = $('#box :nth-child(' + offset + ')');
 
             if (currentNode.size() == 0) {
@@ -88,6 +96,10 @@ var snake = {
         }
 
         $('#head').rotate(angle);
+
+        if (options.updateFireballs == true) {
+            this.updateFireballSize();
+        }
     },
     move: function() {
         for (i = this.body.length - 1; i > 0; i--) {
@@ -139,14 +151,15 @@ var makeAStep = function() {
 
     snake.move();
 
-    if (snake.getHead().isOnPosition(food.position)) {
+    var iJustAteSomeFood = snake.getHead().isOnPosition(food.position);
+
+    if (iJustAteSomeFood == true) {
         food.updateScore();
         generateFood();
         snake.body.push(new snakeItem(lastItemPosition));
     }
 
-    snake.screenUpdate();
-
+    snake.screenUpdate({updateFireballs: iJustAteSomeFood});
 };
 
 var generateFood = function() {
@@ -168,8 +181,9 @@ var generateFood = function() {
 var init = function() {
     //initialize position of snake body
     var offset = 0;
+    snake.updateFireballSize();
     for (i in snake.body) {
-        offset = 2 + parseInt(i);
+        offset = snakeBeginDomOffset + parseInt(i);
         $('#box :nth-child(' + offset + ')').css('left', $('#head').width() * snake.body[i].position.x);
         $('#box :nth-child(' + offset + ')').css('top', $('#head').height() * snake.body[i].position.y);
     }

@@ -1,28 +1,34 @@
 #box {
-    height: 500px;
-    width: 500px;
+    height: 600px;
+    width: 800px;
     border: 2px solid black;
     position: relative;
-    background-color: #999999;
+    background-image: url("http://i296.photobucket.com/albums/mm181/vonaf/stars-background-b-1.gif")
 }
 
 #box #head {   
-    background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJZ1ZkvR03_HawuJuLdbV_1fnG0_r6MdJJJxx39rry-6mMcw9y");
-    background-size: cover;    
+    background-image: url("http://softnauts.com/img/rocket.png");
+    background-size: auto 100%;    
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent;
 }
 
 #box .snakeItem {
-    width: 20px;
-    height: 20px;
-    background-color: pink;
+    width: 40px;
+    height: 40px;
+    background-color: orange;
     position: absolute;
+    border-radius: 50%;
 }
 
 #food {
-    height: 20px;
-    width: 20px;
+    height: 40px;
+    width: 40px;
     position: absolute;
-    background: green;
+    background-image: url("http://www.gifs.com.es/Espacio/image/595/Espacio+%28134%29.gif");
+    background-size: auto 100%;
+    background-color: transparent;
 }
 
 #score {
@@ -32,12 +38,7 @@
     border-radius: 5px;
     background-color: #00FFFF;
     text-align: center;
-    position: relative;
-    left: 510px;
-    top: -500px;
+    position: absolute;
+    left: 810px;
+    top: -0px;
 };
-
-#img {
-    background-image:  url("/home/super-maciek/snake/explosion.gif");
-
-}

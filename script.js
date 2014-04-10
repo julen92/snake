@@ -59,14 +59,14 @@ var snake = {
         var offset = 0;
         var currentNode = null;
         for (i in this.body) {
-            offset = 3 + parseInt(i);
+            offset = 2 + parseInt(i);
             currentNode = $('#box :nth-child(' + offset + ')');
 
             if (currentNode.size() == 0) {
                 $('#box').append($('<div class="snakeItem"></div>'));
                 currentNode = $('#box :nth-child(' + offset + ')');
-                currentNode.css({top: $('#head').height() * this.body[i].position.y + "px"}, duration / 3);
-                currentNode.css({left: $('#head').width() * this.body[i].position.x + "px"}, duration / 3);
+                currentNode.css({top: $('#head').height() * this.body[i].position.y + "px"});
+                currentNode.css({left: $('#head').width() * this.body[i].position.x + "px"});
             } else {
                 currentNode.animate({top: $('#head').height() * this.body[i].position.y + "px"}, duration / 3);
                 currentNode.animate({left: $('#head').width() * this.body[i].position.x + "px"}, duration / 3);
@@ -75,15 +75,15 @@ var snake = {
         var angle = 0;
         if (this.velocity.y === 0) {
             if (this.velocity.x === -1) {
-                angle = 180;
+                angle = -90;
             } else {
-                angle = 0;
+                angle = 90;
             }
         } else {
             if (this.velocity.y === 1) {
-                angle = 90;
+                angle = 180;
             } else {
-                angle = -90;
+                angle = 0;
             }
         }
 
@@ -115,7 +115,22 @@ var food = {
 
 var makeAStep = function() {
     if (snake.detectCollision(snake.velocity) === true) {
-        alert("You Loose, what a pity!");
+        var explosion = $('<div id="explosion"><img src="/home/super-maciek/snake/explosion.gif"></div>');
+        //explosion.css({position: 'absolute', top: $('#head').css('top'), left: $('#head').css('left')});
+        var newcss = {
+            top: parseInt($("#head").css("top").substring(0, $("#head").css("top").length - 2)) - 90 + 'px',
+            left: parseInt($("#head").css("left").substring(0, $("#head").css("left").length - 2)) - 61 + 'px',
+            position: 'absolute'
+        };
+        explosion.css(newcss);
+        console.log(newcss);
+        $('#box').append(explosion);
+        var alertInterval = setInterval(function() {
+            alert("You Loose, what a pity!");
+            clearInterval(alertInterval);
+            $('#explosion').remove();
+        }, 800);
+
         clearInterval(intervalHandler);
         return;
     }
@@ -154,7 +169,7 @@ var init = function() {
     //initialize position of snake body
     var offset = 0;
     for (i in snake.body) {
-        offset = 3 + parseInt(i);
+        offset = 2 + parseInt(i);
         $('#box :nth-child(' + offset + ')').css('left', $('#head').width() * snake.body[i].position.x);
         $('#box :nth-child(' + offset + ')').css('top', $('#head').height() * snake.body[i].position.y);
     }

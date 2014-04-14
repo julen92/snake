@@ -127,7 +127,7 @@ var food = {
 
 var makeAStep = function() {
     if (snake.detectCollision(snake.velocity) === true) {
-        var explosion = $('<div id="explosion"><img src="/home/super-maciek/snake/explosion.gif"></div>');
+        var explosion = $('<div id="explosion"><img src="images/explosion.gif"></div>');
         //explosion.css({position: 'absolute', top: $('#head').css('top'), left: $('#head').css('left')});
         var newcss = {
             top: parseInt($("#head").css("top").substring(0, $("#head").css("top").length - 2)) - 90 + 'px',

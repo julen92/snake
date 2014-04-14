@@ -3,11 +3,11 @@
     width: 800px;
     border: 2px solid black;
     position: relative;
-    background-image: url("http://i296.photobucket.com/albums/mm181/vonaf/stars-background-b-1.gif")
+    background-image: url("images/background.gif")
 }
 
 #box #head {   
-    background-image: url("http://softnauts.com/img/rocket.png");
+    background-image: url("images/rocket.png");
     background-size: auto 100%;    
     background-position: center;
     background-repeat: no-repeat;
@@ -20,7 +20,7 @@
     //background-color: orange;
     position: absolute;
     //border-radius: 50%;
-    background-image: url('ball.png');
+    background-image: url('images/ball.png');
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -30,7 +30,7 @@
     height: 40px;
     width: 40px;
     position: absolute;
-    background-image: url("http://www.gifs.com.es/Espacio/image/595/Espacio+%28134%29.gif");
+    background-image: url("images/softnaut.gif");
     background-size: auto 100%;
     background-color: transparent;
 }

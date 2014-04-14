@@ -1,14 +1,21 @@
 var intervalHandler = null;
 var snakeBeginDomOffset = 2;
 var duration = 150;
+
+var initialSnakeOptions = {
+    items: 3,
+    velocity: new position({x: 1, y: 0}),
+    selector: '.snakeItem'
+};
+
 function position(position) {
     this.x = position.x;
     this.y = position.y
     this.copy = function() {
         return {x: this.x, y: this.y};
     }
-}
-;
+};
+
 function snakeItem(initialPosition) {
     this.position = new position(initialPosition);
     this.isOnPosition = function(position) {
@@ -24,16 +31,8 @@ function snakeItem(initialPosition) {
 }
 
 var snake = {
-    body: [
-        new snakeItem(new position({x: 7, y: 3})),
-        new snakeItem(new position({x: 6, y: 3})),
-        new snakeItem(new position({x: 5, y: 3})),
-        new snakeItem(new position({x: 4, y: 3})),
-        new snakeItem(new position({x: 3, y: 3})),
-        new snakeItem(new position({x: 2, y: 3})),
-        new snakeItem(new position({x: 1, y: 3}))
-    ],
-    velocity: new position({x: 1, y: 0}),
+    body: [],
+    velocity: null,
     getHead: function() {
         return this.body[0];
     },
@@ -56,9 +55,9 @@ var snake = {
         }
         return false;
     },
-    updateFireballSize: function() {      
+    updateFireballSize: function() {
         for (i = this.body.length - 1; i > 0; i--) {
-            currentSize = 100 * (snake.body.length - i)/snake.body.length;
+            currentSize = 100 * (snake.body.length - i +6) / (snake.body.length+6);
             currentNode = $('#box :nth-child(' + (i + snakeBeginDomOffset) + ')');
             currentNode.css('background-size', currentSize + '% ' + currentSize + '%');
         }
@@ -106,9 +105,33 @@ var snake = {
             this.body[i].position = new position(this.body[i - 1].position.copy());
         }
         this.getHead().move(this.velocity);
-    }
-};
+    },
+    init: function(options) {
+        this.velocity = options.velocity;
+        this.body = [
+            new snakeItem(new position({x: 7, y: 3})),
+            new snakeItem(new position({x: 6, y: 3})),
+            new snakeItem(new position({x: 5, y: 3})),
+            new snakeItem(new position({x: 4, y: 3})),
+            new snakeItem(new position({x: 3, y: 3})),
+            new snakeItem(new position({x: 2, y: 3})),
+            new snakeItem(new position({x: 1, y: 3}))
+        ];
 
+        //initialize position of snake body
+        var offset = 0;
+
+        for (i in this.body) {
+            offset = snakeBeginDomOffset + parseInt(i);
+            $('#box :nth-child(' + offset + ')').css('left', $('#head').width() * this.body[i].position.x);
+            $('#box :nth-child(' + offset + ')').css('top', $('#head').height() * this.body[i].position.y);
+        }
+
+        this.velocity = null;
+
+        this.updateFireballSize();
+    },
+};
 var food = {
     position: {
         x: 0,
@@ -128,22 +151,20 @@ var food = {
 var makeAStep = function() {
     if (snake.detectCollision(snake.velocity) === true) {
         var explosion = $('<div id="explosion"><img src="images/explosion.gif"></div>');
-        //explosion.css({position: 'absolute', top: $('#head').css('top'), left: $('#head').css('left')});
         var newcss = {
             top: parseInt($("#head").css("top").substring(0, $("#head").css("top").length - 2)) - 90 + 'px',
             left: parseInt($("#head").css("left").substring(0, $("#head").css("left").length - 2)) - 61 + 'px',
             position: 'absolute'
         };
         explosion.css(newcss);
-        console.log(newcss);
         $('#box').append(explosion);
         var alertInterval = setInterval(function() {
-            alert("You Loose, what a pity!");
             clearInterval(alertInterval);
             $('#explosion').remove();
         }, 800);
 
         clearInterval(intervalHandler);
+        intervalHandler == null;
         return;
     }
 
@@ -179,16 +200,12 @@ var generateFood = function() {
 };
 
 var init = function() {
-    //initialize position of snake body
-    var offset = 0;
-    snake.updateFireballSize();
-    for (i in snake.body) {
-        offset = snakeBeginDomOffset + parseInt(i);
-        $('#box :nth-child(' + offset + ')').css('left', $('#head').width() * snake.body[i].position.x);
-        $('#box :nth-child(' + offset + ')').css('top', $('#head').height() * snake.body[i].position.y);
-    }
-
+    snake.init(initialSnakeOptions);
     generateFood();
+
+    if (intervalHandler != null)
+        clearInterval(intervalHandler);
+    intervalHandler = setInterval(makeAStep, duration);
 };
 
 $(document).ready(function() {
@@ -208,7 +225,11 @@ $(document).ready(function() {
                 break;
         }
     });
+    
     init();
-    intervalHandler = setInterval(makeAStep, duration);
+    
+    $('#box').on('dblclick',function(eventObject){
+        init();
+    });
 });
 

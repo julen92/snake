@@ -1,12 +1,7 @@
 var intervalHandler = null;
-var snakeBeginDomOffset = 2;
+var snakeBeginDomOffset = 3;
 var duration = 150;
 
-var initialSnakeOptions = {
-    items: 3,
-    velocity: new position({x: 1, y: 0}),
-    selector: '.snakeItem'
-};
 
 function position(position) {
     this.x = position.x;
@@ -14,6 +9,12 @@ function position(position) {
     this.copy = function() {
         return {x: this.x, y: this.y};
     }
+};
+
+var initialSnakeOptions = {
+    items: 3,
+    velocity: new position({x: 1, y: 0}),
+    class: 'snakeItem'
 };
 
 function snakeItem(initialPosition) {
@@ -32,12 +33,14 @@ function snakeItem(initialPosition) {
 
 var snake = {
     body: [],
+    class: '',
     velocity: null,
     getHead: function() {
         return this.body[0];
     },
     detectCollision: function(velocity) {
-        for (i = this.body.length - snakeBeginDomOffset; i > 0; i--) {
+        console.log(this.velocity);
+        for (i = this.body.length - 1; i > 0; i--) {
             if (this.body[i].position.x == (this.getHead().position.x + this.velocity.x)
                     && this.body[i].position.y == (this.getHead().position.y + this.velocity.y)) {
                 return true;
@@ -57,7 +60,7 @@ var snake = {
     },
     updateFireballSize: function() {
         for (i = this.body.length - 1; i > 0; i--) {
-            currentSize = 100 * (snake.body.length - i +6) / (snake.body.length+6);
+            currentSize = 100 * (snake.body.length - i + 6) / (snake.body.length + 6);
             currentNode = $('#box :nth-child(' + (i + snakeBeginDomOffset) + ')');
             currentNode.css('background-size', currentSize + '% ' + currentSize + '%');
         }
@@ -108,18 +111,24 @@ var snake = {
     },
     init: function(options) {
         this.velocity = options.velocity;
+        
         this.body = [
             new snakeItem(new position({x: 7, y: 3})),
             new snakeItem(new position({x: 6, y: 3})),
             new snakeItem(new position({x: 5, y: 3})),
-            new snakeItem(new position({x: 4, y: 3})),
-            new snakeItem(new position({x: 3, y: 3})),
-            new snakeItem(new position({x: 2, y: 3})),
-            new snakeItem(new position({x: 1, y: 3}))
         ];
+        this.class = options.class;
 
         //initialize position of snake body
         var offset = 0;
+        $('#box .'+this.class).remove();
+        
+        for (i in this.body){
+            var newHtml = '<div';
+            if(i == 0) newHtml += ' id="head"';
+            newHtml += ' class="' + this.class+ '"></div>';
+            $('#box').append($(newHtml));
+        }
 
         for (i in this.body) {
             offset = snakeBeginDomOffset + parseInt(i);
@@ -127,10 +136,8 @@ var snake = {
             $('#box :nth-child(' + offset + ')').css('top', $('#head').height() * this.body[i].position.y);
         }
 
-        this.velocity = null;
-
         this.updateFireballSize();
-    },
+    }
 };
 var food = {
     position: {
@@ -159,8 +166,10 @@ var makeAStep = function() {
         explosion.css(newcss);
         $('#box').append(explosion);
         var alertInterval = setInterval(function() {
+
             clearInterval(alertInterval);
             $('#explosion').remove();
+            $('#game-over').css('display','block');
         }, 800);
 
         clearInterval(intervalHandler);
@@ -205,6 +214,7 @@ var init = function() {
 
     if (intervalHandler != null)
         clearInterval(intervalHandler);
+    $('#game-over').css('display','none');
     intervalHandler = setInterval(makeAStep, duration);
 };
 
@@ -225,11 +235,11 @@ $(document).ready(function() {
                 break;
         }
     });
-    
+
     init();
-    
-    $('#box').on('dblclick',function(eventObject){
+
+    $('#box').on('dblclick', function(eventObject) {
         init();
-    });
+        });
 });
 

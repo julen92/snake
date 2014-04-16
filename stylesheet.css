@@ -6,6 +6,19 @@
     background-image: url("images/background.jpg")
 }
 
+#box #game-over {
+    color: white;
+    top: 25%;
+    left: 1%;
+    position: absolute;
+    font-family: 'Lobster', Georgia, Times, serif;
+    font-size: 70px;
+    text-align: center;
+   
+    
+}
+
+
 #box #head {   
     background-image: url("images/rocket.png");
     background-size: auto 100%;    

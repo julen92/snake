@@ -14,8 +14,6 @@
     font-family: 'Lobster', Georgia, Times, serif;
     font-size: 70px;
     text-align: center;
-   
-    
 }
 
 
@@ -27,7 +25,7 @@
     background-color: transparent;
 }
 
-#box .snakeItem {
+#box .rocket {
     width: 40px;
     height: 40px;
     //background-color: orange;

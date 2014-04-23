@@ -14,7 +14,8 @@ function position(position) {
 var initialSnakeOptions = {
     items: 3,
     velocity: new position({x: 1, y: 0}),
-    class: 'rocket'
+    class: 'rocket',
+    AIControlled: false
 };
 
 function snakeItem(initialPosition) {
@@ -28,28 +29,20 @@ function snakeItem(initialPosition) {
     };
     this.moveTo = function(newPosition) {
         this.position = newPosition;
-    };
-    this.updateFireballSize = function() {
-        var DOMitems = this.getDomItems();
-        for (i = DOMitems.length - 1; i > 0; i--) {
-            currentSize = 100 * (snake.body.length - i + 6) / (snake.body.length + 6);
-            currentNode = $(DOMitems[i]);
-            currentNode.css('background-size', currentSize + '% ' + currentSize + '%');
-        }
-    };
+    }
 }
 
-function buildSnake(options) {
+function snakeBuilder(){
     this.body = [];
-    this.class = options.class;
+    this.class = '';
     this.velocity = null;
+    this.isAI = false;
+    
     this.getHead = function() {
         return this.body[0];
     };
-    this.getDomItems = function(){
-        return $('#box .'+ this.class);
-    };
-    this.detectCollision= function(velocity) {
+    
+    this.detectCollision = function(velocity) {
         console.log(this.velocity);
         for (i = this.body.length - 1; i > 0; i--) {
             if (this.body[i].position.x == (this.getHead().position.x + this.velocity.x)
@@ -69,60 +62,25 @@ function buildSnake(options) {
         }
         return false;
     };
-}
-
-var snake = new buildSnake({});
-var flyingSaucer = new buildSnake({});
-
-var snake = {
-    body: [],
-    class: '',
-    velocity: null,
-    getHead: function() {
-        return this.body[0];
-    },
-    getDomItems: function(){
-        return $('#box .'+ this.class);
-    },
-    detectCollision: function(velocity) {
-        console.log(this.velocity);
+    
+    this.updateFireballSize = function() {
         for (i = this.body.length - 1; i > 0; i--) {
-            if (this.body[i].position.x == (this.getHead().position.x + this.velocity.x)
-                    && this.body[i].position.y == (this.getHead().position.y + this.velocity.y)) {
-                return true;
-            }
-        }
-
-        if (
-                this.getHead().position.x + this.velocity.x + 1 > $('#box').width() / $('#head').width() ||
-                this.getHead().position.y + this.velocity.y + 1 > $('#box').height() / $('#head').height() ||
-                this.getHead().position.x + this.velocity.x < 0 ||
-                this.getHead().position.y + this.velocity.y < 0
-                )
-        {
-            return true;
-        }
-        return false;
-    },
-    updateFireballSize: function() {
-        var DOMitems = this.getDomItems();
-        for (i = DOMitems.length - 1; i > 0; i--) {
             currentSize = 100 * (snake.body.length - i + 6) / (snake.body.length + 6);
-            currentNode = $(DOMitems[i]);
+            currentNode = $('#box :nth-child(' + (i + snakeBeginDomOffset) + ')');
             currentNode.css('background-size', currentSize + '% ' + currentSize + '%');
         }
-    },
-    screenUpdate: function(options) {
+    };
+    
+    this.screenUpdate = function(options) {
         var offset = 0;
         var currentNode = null;
-        var DOMitems = this.getDomItems();
         for (i in this.body) {
-            offset = parseInt(i);
-            currentNode = $(DOMitems[i]);
+            offset = snakeBeginDomOffset + parseInt(i);
+            currentNode = $('#box :nth-child(' + offset + ')');
 
             if (currentNode.size() == 0) {
-                currentNode = $('<div class="snakeItem"></div>');
-                $('#box').append(currentNode);
+                $('#box').append($('<div class="' + this.class + '"></div>'));
+                currentNode = $('#box :nth-child(' + offset + ')');
                 currentNode.css({top: $('#head').height() * this.body[i].position.y + "px"});
                 currentNode.css({left: $('#head').width() * this.body[i].position.x + "px"});
             } else {
@@ -150,15 +108,23 @@ var snake = {
         if (options.updateFireballs == true) {
             this.updateFireballSize();
         }
-    },
-    move: function() {
+    };
+    
+    this.move = function() {
         for (i = this.body.length - 1; i > 0; i--) {
             this.body[i].position = new position(this.body[i - 1].position.copy());
         }
         this.getHead().move(this.velocity);
-    },
-    init: function(options) {
+    };
+    
+    this.setDijkstraVelocity = function() {
+        console.log('hey jude!');
+    };
+    
+    this.init = function(options) {
         this.velocity = options.velocity;
+        
+        this.isAI = options.AIControlled;
         
         this.body = [
             new snakeItem(new position({x: 7, y: 3})),
@@ -178,17 +144,17 @@ var snake = {
             $('#box').append($(newHtml));
         }
 
-        var DOMitems = this.getDomItems();
         for (i in this.body) {
-            currentNode = $(DOMitems[i]);
-            console.log(DOMitems[i])
-            currentNode.css('left', $('#head').width() * this.body[i].position.x);
-            currentNode.css('top', $('#head').height() * this.body[i].position.y);
+            offset = snakeBeginDomOffset + parseInt(i);
+            $('#box :nth-child(' + offset + ')').css('left', $('#head').width() * this.body[i].position.x);
+            $('#box :nth-child(' + offset + ')').css('top', $('#head').height() * this.body[i].position.y);
         }
 
         this.updateFireballSize();
-    }
-};
+    };
+}
+
+var snake = new snakeBuilder();
 var food = {
     position: {
         x: 0,
@@ -206,6 +172,9 @@ var food = {
 };
 
 var makeAStep = function() {
+    if(snake.isAI) {
+        snake.setDijkstraVelocity();
+    }
     if (snake.detectCollision(snake.velocity) === true) {
         var explosion = $('<div id="explosion"><img src="images/explosion.gif"></div>');
         var newcss = {

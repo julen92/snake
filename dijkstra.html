@@ -6,25 +6,114 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Dijkstra</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
+        <style>
+            input {
+                width: 40px;
+                height: 40px;
+            }
+        </style>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     </head>
     <body>
-        <div>TODO write content</div>
-        <textarea></textarea>
+        <div>Dijkstra</div>
+        <table>
+            <tr><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td></tr><tr><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td></tr><tr><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td></tr><tr><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td></tr><tr><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td></tr><tr><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td></tr><tr><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td></tr><tr><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td></tr><tr><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td><td><input value=""></td></tr>
+        </table>
+        <button id="clear">Clear</button>
+        <button id="find">Find</button>
+        <button id="manual"> Manual </button>
         <script>
-            $(function(){
-                var text = '';
-                for(i=1; i<10; i++){
-                    $('textarea').text( $('textarea').text() + '<tr>');
-                    for(j=1; j<10; j++) {
-                        $('textarea').text( $('textarea').text() + '<td></td>');;
+            function getCellNode(rowIndex, columnIndex) {
+                return $('table tr:nth-child(' + (rowIndex + 1) + ') td:nth-child(' + (columnIndex + 1) + ') input');
+            }
+            ;
+            function getCellValue(rowIndex, columnIndex) {
+                return getCellNode(rowIndex, columnIndex).val();
+            }
+            ;
+
+            function setCellValue(rowIndex, columnIndex, newValue) {
+                getCellNode(rowIndex, columnIndex).val(newValue);
+            }
+            ;
+
+            function populateNeighbours(rowIndex, columnIndex) {
+
+                var anythingChanged = false;
+
+                var oldValue = getCellValue(rowIndex, columnIndex);
+                if (oldValue == '' || oldValue == 'x')
+                    return false;
+                var newValue = parseInt(oldValue) + 1;
+
+                var i = rowIndex;
+                var j = columnIndex;
+
+                var fieldsToPopulate = [
+                    {x: i - 1, y: j},
+                    {x: i + 1, y: j},
+                    {x: i, y: j + 1},
+                    {x: i, y: j - 1}
+                ];
+
+                for (i in fieldsToPopulate) {
+                    if (getCellValue(fieldsToPopulate[i].x, fieldsToPopulate[i].y) == '')
+                    {
+                        setCellValue(fieldsToPopulate[i].x, fieldsToPopulate[i].y, newValue);
+                        anythingChanged = true;
                     }
-                    $('textarea').text( $('textarea').text() + '</tr>');
+                    ;
                 }
-                
+                return anythingChanged;
+
+            }
+            ;
+            
+            function findDijkstraPath(){
+                var anyFieldHasChanged = true;
+                    while (anyFieldHasChanged == true) {
+                        anyFieldHasChanged = false;
+                        $.each($('tr'), function(rowIndex, value) {
+                            $.each($(value).find('td'), function(columnIndex, columnValue) {
+                                if (populateNeighbours(rowIndex, columnIndex)) {
+                                    anyFieldHasChanged = true;
+                                }
+                            });
+                        });
+                    }
+            }
+
+
+            $(function() {
+                $('button#clear').bind('click', function() {
+                    $('input').val('');
+                });
+
+                $('button#find').bind('click', function() {
+                    $.each($('tr'), function(index, value) {
+                        $.each($(value).find('td'), function(columnIndex, columnValue) {
+                            $(columnValue).find('input').val(index + ' . ' + columnIndex);
+                        });
+                    });
+
+//                var text = '';
+//                for(i=1; i<10; i++){
+//                    $('textarea').text( $('textarea').text() + '<tr>');
+//                    for(j=1; j<10; j++) {
+//                        $('textarea').text( $('textarea').text() + '<td><input value=""></td>');;
+//                    }
+//                    $('textarea').text( $('textarea').text() + '</tr>');
+//                }
+
+                });
+
+                $('button#manual').bind('click', function() {
+                    findDijkstraPath();
+                });
+
             });
         </script>
     </body>

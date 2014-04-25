@@ -2,20 +2,20 @@ var intervalHandler = null;
 var snakeBeginDomOffset = 3;
 var duration = 150;
 
-
 function position(position) {
     this.x = position.x;
     this.y = position.y
     this.copy = function() {
         return {x: this.x, y: this.y};
     }
-};
+}
+;
 
 var initialSnakeOptions = {
     items: 3,
     velocity: new position({x: 1, y: 0}),
     class: 'rocket',
-    AIControlled: false
+    AIControlled: true
 };
 
 function snakeItem(initialPosition) {
@@ -32,16 +32,16 @@ function snakeItem(initialPosition) {
     }
 }
 
-function snakeBuilder(){
+function snakeBuilder() {
     this.body = [];
     this.class = '';
     this.velocity = null;
     this.isAI = false;
-    
+
     this.getHead = function() {
         return this.body[0];
     };
-    
+
     this.detectCollision = function(velocity) {
         console.log(this.velocity);
         for (i = this.body.length - 1; i > 0; i--) {
@@ -62,7 +62,7 @@ function snakeBuilder(){
         }
         return false;
     };
-    
+
     this.updateFireballSize = function() {
         for (i = this.body.length - 1; i > 0; i--) {
             currentSize = 100 * (snake.body.length - i + 6) / (snake.body.length + 6);
@@ -70,7 +70,7 @@ function snakeBuilder(){
             currentNode.css('background-size', currentSize + '% ' + currentSize + '%');
         }
     };
-    
+
     this.screenUpdate = function(options) {
         var offset = 0;
         var currentNode = null;
@@ -109,23 +109,23 @@ function snakeBuilder(){
             this.updateFireballSize();
         }
     };
-    
+
     this.move = function() {
         for (i = this.body.length - 1; i > 0; i--) {
             this.body[i].position = new position(this.body[i - 1].position.copy());
         }
         this.getHead().move(this.velocity);
     };
-    
+
     this.setDijkstraVelocity = function() {
-        console.log('hey jude!');
+        displayTiles(getEmptyTiles());
     };
-    
+
     this.init = function(options) {
         this.velocity = options.velocity;
-        
+
         this.isAI = options.AIControlled;
-        
+
         this.body = [
             new snakeItem(new position({x: 7, y: 3})),
             new snakeItem(new position({x: 6, y: 3})),
@@ -135,12 +135,13 @@ function snakeBuilder(){
 
         //initialize position of snake body
         var offset = 0;
-        $('#box .'+this.class).remove();
-        
-        for (i in this.body){
+        $('#box .' + this.class).remove();
+
+        for (i in this.body) {
             var newHtml = '<div';
-            if(i == 0) newHtml += ' id="head"';
-            newHtml += ' class="' + this.class+ '"></div>';
+            if (i == 0)
+                newHtml += ' id="head"';
+            newHtml += ' class="' + this.class + '"></div>';
             $('#box').append($(newHtml));
         }
 
@@ -171,8 +172,37 @@ var food = {
 
 };
 
+function getRowsCount() {
+    return 10;
+}
+;
+function getColumnsCount() {
+    return 10;
+}
+;
+function getEmptyTiles() {
+    var tiles = [];
+    for (i = 0; i < getRowsCount(); i++) {
+        tiles [i] = [];
+        for (j = 0; j < getColumnsCount(); j++) {
+            tiles [i][j] = null;
+        }
+    }
+    return tiles;
+}
+
+function displayTiles(tiles){
+    for(i in tiles){
+        var tileRow = '';
+        for(j in tiles[i]){
+            tileRow = tileRow + tiles[i][j]+ ' ';
+        }
+        console.log(tileRow);
+    }
+}
+
 var makeAStep = function() {
-    if(snake.isAI) {
+    if (snake.isAI) {
         snake.setDijkstraVelocity();
     }
     if (snake.detectCollision(snake.velocity) === true) {
@@ -188,7 +218,7 @@ var makeAStep = function() {
 
             clearInterval(alertInterval);
             $('#explosion').remove();
-            $('#game-over').css('display','block');
+            $('#game-over').css('display', 'block');
         }, 800);
 
         clearInterval(intervalHandler);
@@ -231,34 +261,35 @@ var init = function() {
     snake.init(initialSnakeOptions);
     generateFood();
 
-    if (intervalHandler != null)
+    if (intervalHandler !== null)
         clearInterval(intervalHandler);
-    $('#game-over').css('display','none');
-    intervalHandler = setInterval(makeAStep, duration);
+    $('#game-over').css('display', 'none');
+    //intervalHandler = setInterval(makeAStep, duration);
 };
+
 
 $(document).ready(function() {
     $(document).keydown(function(key) {
-        switch (parseInt(key.which, 10)) {
-            case 37:  /* a = go left*/
-                snake.velocity = {x: -1, y: 0};
-                break;
-            case 40: /* s = go down */
-                snake.velocity = {x: 0, y: 1};
-                break;
-            case 38:   /* w = go up*/
-                snake.velocity = {x: 0, y: -1};
-                break;
-            case 39: /* d = go right */
-                snake.velocity = {x: 1, y: 0};
-                break;
-        }
+//        switch (parseInt(key.which, 10)) {
+//            case 37:  /* a = go left*/
+//                snake.velocity = {x: -1, y: 0};
+//                break;
+//            case 40: /* s = go down */
+//                snake.velocity = {x: 0, y: 1};
+//                break;
+//            case 38:   /* w = go up*/
+//                snake.velocity = {x: 0, y: -1};
+//                break;
+//            case 39: /* d = go right */
+//                snake.velocity = {x: 1, y: 0};
+//                break;
+//        }
     });
 
     init();
 
     $('#box').on('dblclick', function(eventObject) {
         init();
-        });
+    });
 });
 

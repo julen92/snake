@@ -2,6 +2,8 @@ var intervalHandler = null;
 var snakeBeginDomOffset = 3;
 var duration = 150;
 
+var debug = false;
+
 function position(position) {
     this.x = position.x;
     this.y = position.y
@@ -43,7 +45,8 @@ function snakeBuilder() {
     };
 
     this.detectCollision = function(velocity) {
-        console.log(this.velocity);
+        if (debug)
+            console.log(this.velocity);
         for (i = this.body.length - 1; i > 0; i--) {
             if (this.body[i].position.x == (this.getHead().position.x + this.velocity.x)
                     && this.body[i].position.y == (this.getHead().position.y + this.velocity.y)) {
@@ -118,7 +121,14 @@ function snakeBuilder() {
     };
 
     this.setDijkstraVelocity = function() {
-        displayTiles(getEmptyTiles());
+        var tilesMap = getEmptyTiles();
+
+        tilesMap = updateTilesMap(tilesMap);
+
+        tilesMap = findDijkstraPath(tilesMap);
+
+        displayTiles(tilesMap);
+
     };
 
     this.init = function(options) {
@@ -173,32 +183,121 @@ var food = {
 };
 
 function getRowsCount() {
-    return 10;
+    return 16;
 }
 ;
 function getColumnsCount() {
-    return 10;
+    return 20;
 }
 ;
 function getEmptyTiles() {
     var tiles = [];
-    for (i = 0; i < getRowsCount(); i++) {
+    for (i = -1; i <= getRowsCount(); i++) {
         tiles [i] = [];
-        for (j = 0; j < getColumnsCount(); j++) {
+        for (j = -1; j <= getColumnsCount(); j++) {
             tiles [i][j] = null;
         }
     }
     return tiles;
 }
 
-function displayTiles(tiles){
-    for(i in tiles){
+function updateTilesMap(myMap) {
+    var body = snake.body;
+    for (itemIndex in body) {
+        myMap[body[itemIndex].position.y][body[itemIndex].position.x] = ' X';
+    }
+    myMap[snake.getHead().position.y][snake.getHead().position.x] = ' H';
+
+    myMap[food.position.y][food.position.x] = 0;
+
+    return myMap;
+}
+
+
+
+function displayTiles(tiles) {
+    for (i in tiles) {
         var tileRow = '';
-        for(j in tiles[i]){
-            tileRow = tileRow + tiles[i][j]+ ' ';
+        for (j in tiles[i]) {
+            tileRow = tileRow + tiles[i][j] + ' ';
         }
         console.log(tileRow);
     }
+}
+
+
+function getCellValue(myMap, rowIndex, columnIndex) {
+    if (debug)
+        console.log('get', rowIndex, columnIndex);
+    if (myMap[rowIndex] && myMap[rowIndex][columnIndex])
+        return '';
+    if (debug)
+        console.log(myMap[rowIndex][columnIndex]);
+    return myMap[rowIndex][columnIndex];
+}
+;
+
+function setCellValue(myMap, rowIndex, columnIndex, newValue) {
+    console.log(newValue);
+    if (debug)
+        console.log('set', rowIndex, columnIndex);
+    if (myMap[rowIndex] && myMap[rowIndex][columnIndex])
+        return '';
+    myMap[rowIndex][columnIndex] = newValue;
+}
+;
+
+function populateNeighbours(myMap, rowIndex, columnIndex) {
+    var anythingChanged = false;
+    var oldValue = getCellValue(myMap, rowIndex, columnIndex);
+    if (isNaN(parseInt(oldValue)))
+        return false;
+    var newValue = parseInt(oldValue) + 1;
+
+    var i = rowIndex;
+    var j = columnIndex;
+
+    var fieldsToPopulate = [
+        {x: i - 1, y: j},
+        {x: i + 1, y: j},
+        {x: i, y: j + 1},
+        {x: i, y: j - 1}
+    ];
+
+    for (i in fieldsToPopulate) {
+        if (getCellValue(myMap, fieldsToPopulate[i].x, fieldsToPopulate[i].y) == null)
+        {
+            setCellValue(myMap, fieldsToPopulate[i].x, fieldsToPopulate[i].y, newValue);
+            anythingChanged = true;
+        }
+        ;
+    }
+    console.log('dddd' + anythingChanged);
+    return anythingChanged;
+
+}
+;
+
+function findDijkstraPath(myMap) {
+    var anyFieldHasChanged = true;
+    var iterationsCount = 0;
+    while (iterationsCount++ < 35) {
+        console.log(anyFieldHasChanged + 'jmjm')
+
+        anyFieldHasChanged = false;
+        for (rowIndex = 0; rowIndex < getRowsCount(); rowIndex++) {
+
+            for (columnIndex = 0; columnIndex < getColumnsCount(); columnIndex++) {
+
+                if (populateNeighbours(myMap, rowIndex, columnIndex)) {
+                    console.log('!');
+                    anyFieldHasChanged = true;
+                }
+            }
+        }
+
+    }
+    return myMap;
 }
 
 var makeAStep = function() {
@@ -256,6 +355,12 @@ var generateFood = function() {
         food.position.y++;
     food.screenUpdate();
 };
+
+
+
+
+
+
 
 var init = function() {
     snake.init(initialSnakeOptions);

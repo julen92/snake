@@ -216,7 +216,7 @@ function updateTilesMap(myMap) {
 
 
 function displayTiles(tiles) {
-    for (i in tiles) {
+    for (i in tiles) {x
         var tileRow = '';
         for (j in tiles[i]) {
             tileRow = tileRow + tiles[i][j] + ' ';
@@ -269,14 +269,12 @@ function populateNeighbours(myMap, rowIndex, columnIndex) {
         {
             setCellValue(myMap, fieldsToPopulate[i].x, fieldsToPopulate[i].y, newValue);
             anythingChanged = true;
-        }
-        ;
+        };
     }
     console.log('dddd' + anythingChanged);
     return anythingChanged;
 
-}
-;
+};
 
 function findDijkstraPath(myMap) {
     var anyFieldHasChanged = true;
